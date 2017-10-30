@@ -31,8 +31,13 @@ enabled=1
 
 }
 
-function update_kafka_dns() {
-    launch_index=$(echo 1 + $(curl "http://169.254.169.254/latest/meta-data/ami-launch-index") | bc)
+function update_kafka_dns() {    
+    # get availability zone: eg. ap-southeast-2a
+    az=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)
+    
+    # get number from az tail value. ap-southeast-2a => a => 1
+    launch_index=$(echo -n $az | tail -c 1 | tr abcdef 123456)
+    
     private_ip=$(curl "http://169.254.169.254/latest/meta-data/local-ipv4")
 
     tmp_file_name=tmp-record.json
